@@ -438,3 +438,30 @@ Ahora, para hacer un backup de la base de datos de ese contenedor ejecutamos:
 `docker exec mysqlwp mysqldump --all-databases --password=wordpressdocker > wordpress.backup`
 
 Ahora ejecutamos `$ ls` y veremos el archivo `wordpress.backup` :)
+
+
+## Compartir información entre el Docker Host y los contenedores
+
+**Problem:**
+
+Tenemos información local, que queremos que este disponible en un contenedor.
+
+**Solución:**
+
+Usando volúmenes (opción `-v` antes vista) para montar uno entre le host y el contenedor.
+
+Por ejemplo si queremos compartir nuestro directorio de trabajo, con un directorio particular del contenedor podríamos hacer:
+
+`docker run -ti -v "$PWD":/pepe ubuntu:14.04 /bin/bash`
+
+Lo que hicimos con ese comando, fue montar como volumen nuestro directorio actual con el directorio `/pepe` en el contenedor (OJO, `/` referencia al root del filesystem). Además como vimos antes con el `-ti` levantamos un tty y de modo interativo ejecutamos una instancia de bash.
+
+**Algo más:**
+
+Docker provee de un comando `docker inspect` que sirve para observar la información de un contendor.
+
+`docker inspect -f {{.Mounts}} <container-id>`
+
+Con el comando anterior, filtramos de toda la información, solo los puntos de montaje. Como salida obtendremos algo como:
+
+`[{ /path/to/pwd /pepe  true}]`
