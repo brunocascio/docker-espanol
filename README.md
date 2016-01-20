@@ -479,12 +479,12 @@ El volúmen especificado se crea como de lectura-escritura dentro del contenedor
 
 ```
 $ docker run -ti --name=cont1 -v /pepe ubuntu:14.04 /bin/bash
-root@pepe:/# touch /pepe/foobar
-root@pepe:/# ls pepe/
+root@cont1:/# touch /pepe/foobar
+root@cont1:/# ls pepe/
 foobar
-root@pepe:/# exit
+root@cont1:/# exit
 exit
-bash-4.3$ docker inspect -f {{.Mounts}} pepe
+bash-4.3$ docker inspect -f {{.Mounts}} cont1
 [{dbba7caf8d07b862b61b39... /var/lib/docker/volumes/dbba7caf8d07b862b61b39... \
 /_data /pepe local true}]
 $ sudo ls /var/lib/docker/volumes/dbba7caf8d07b862b61b39...
