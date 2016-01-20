@@ -527,3 +527,50 @@ $ docker cp testcopy:/root/file.txt pepe.txt
 $ ls
 pepe.txt
 ```
+
+## Crear y compartir `Docker Images`
+
+Despues de crear varios contenedores, tal vez quisiéramos crear nuestras propias imágenes también. Cuando iniciamos un contenedor, al mismo lo iniciamos desde una imagen base. Una vez con el contenedor en ejecución nosotros podríamos hacer cambios, por ejemplo instalarle ciertas librerias o dependencias (ejemplo correr `apt install htop vim git` dentro de un contenedor que tiene de imagen base, `ubuntu`).
+Luego de haber ejecutado este comando, el contenedor ha modificado su filesystem. Nosotros a futuro tal vez quiseríeramos ejecutar contenedores iguales al anterior, por lo que Docker nos provee del comando `commit` para a partir de un contenedor, crear una imagen.
+Docker mantiene las diferencias entre la imagen base y la que se quiere crear, creando una nueva *layer* usando [UnionFS](https://es.wikipedia.org/wiki/UnionFS). Similar a *git*.
+
+Crearemos un contenedor de *ubuntu*, y al mismo le actualizaremos la lista de repositorios. Luego de ello, haremos un `docker commit`, para definir la nueva imagen para mantener una imagen mas actualizada.
+
+```
+$ docker run -t -i --name=contenedorPrueba ubuntu:14.04 /bin/bash
+root@69079aaaaab1:/# apt update
+```
+
+Cuando salgamos de este contenedor, el mismo se detendrá, pero seguirá estando disponibles a menos que lo eliminemos explícitamente con `docker rm`. Ahora commitiemos el contenedor, para crear una nueva imagen.
+
+```
+$ docker commit contenedorPrueba ubuntu:update
+13132d42da3cc40e8d8b4601a7e2f4dbf198e9d72e37e19ee1986c280ffcb97c
+$ docker images
+REPOSITORY    TAG     IMAGE ID      CREATED          VIRTUAL SIZE
+ubuntu        update  13132d42da3c  5 days ago  ...  213 MB
+```
+
+**NOTA:** Esto `ubuntu:update` especifica `<nombre_imagen>:<tag_del_commit>`.
+
+Luego ya podremos lanzar contenedores basados en la nueva imagen `ubuntu:update`.
+
+**ADICIONAL**
+
+Podemos chequear las diferencias con `docker diff`.
+
+```
+$ docker diff contenedorPrueba
+C /root
+A /root/.bash_history
+C /tmp
+C /var
+C /var/cache
+C /var/cache/apt
+D /var/cache/apt/pkgcache.bin
+D /var/cache/apt/srcpkgcache.bin
+C /var/lib
+C /var/lib/apt
+C /var/lib/apt/lists
+...
+```
