@@ -465,3 +465,65 @@ Docker provee de un comando `docker inspect` que sirve para observar la informac
 Con el comando anterior, filtramos de toda la información, solo los puntos de montaje. Como salida obtendremos algo como:
 
 `[{ /path/to/pwd /pepe  true}]`
+
+## Compartir información entre contenedores
+
+**Problema:**
+
+Ya sabemos como montar un volumen de nuestro Host en un contenedor. Pero ahora quisiéramos compartir ese volumen definido en el contenedor con otros contenedores.
+
+**Solución:**
+
+Usando *data containers*. Cuando queremos montar un volúmen en un contenedor lo que hacemos es con el argumento `-v` decirle el directorio *X* del host que debe montarse en el el path *Y* del contenedor.
+El volúmen especificado se crea como de lectura-escritura dentro del contenedor y no como las capas de sólo lectura usadas para crear el contenedor, pudiéndose modificar también desde la maquina host.
+
+```
+$ docker run -ti --name=cont1 -v /pepe ubuntu:14.04 /bin/bash
+root@pepe:/# touch /pepe/foobar
+root@pepe:/# ls pepe/
+foobar
+root@pepe:/# exit
+exit
+bash-4.3$ docker inspect -f {{.Mounts}} pepe
+[{dbba7caf8d07b862b61b39... /var/lib/docker/volumes/dbba7caf8d07b862b61b39... \
+/_data /pepe local true}]
+$ sudo ls /var/lib/docker/volumes/dbba7caf8d07b862b61b39...
+foobar
+```
+
+Y ahora ejecutamos otro contenedor con el volumen anteriormente creado.
+
+```
+$ docker run --volumes-from=cont1 --name=cont2 ubuntu:14.04
+$ docker inspect -f {{.Mounts}} cont2
+[{4ee1d9e3d453e843819c6ff... /var/lib/docker/volumes/4ee1d9e3d453e843819c6ff... \
+/_data /pepe local true]
+```
+
+## Copiando datos entre el host desde y para los contenedores
+
+**Problema:**
+
+Tenemos un contenedor que no tiene volúmenes cofigurados, y queremos copiar archivos desde y en el contenedor.
+
+**Solución:**
+
+Usando `docker cp` para pasar información desde y para un contenedor en ejecución.
+
+Podemos ver más opciones con `docker cp --help` ó sólo `docker cp`.
+
+Por ejemplo, para pasar archivos desde el docker host hacia el contenedor:
+
+```
+$ docker run -d --name testcopy ubuntu:14.04 sleep 360
+$ touch pepe.txt
+$ docker cp pepe.txt testcopy:/root/file.txt
+```
+
+Y pasando del contenedor hacia el docker host:
+
+```
+$ docker cp testcopy:/root/file.txt pepe.txt
+$ ls
+pepe.txt
+```
