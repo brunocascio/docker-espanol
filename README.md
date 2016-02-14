@@ -574,3 +574,43 @@ C /var/lib/apt
 C /var/lib/apt/lists
 ...
 ```
+
+## Guardando Images y Containers como archivos .tar para compartir
+
+**Problema:** Tenemos creados imagenes o tenemos contenedores que queremos mantener y nos gustaría compartirlo con nuestros colaboradores.
+
+**Solución:**
+
+  * Para las `images`: Usar los comandos `save` y `load` para crear el archivo comprimido de la imagen anteriormente creada.
+  * Para los `containers`: Usar los comandos `import` y `export`.
+
+Comencemos con un `container` creado y exportándolo en un archivo `.tar` (tarball).
+
+```
+  $ docker ps -a
+  CONTAINER ID  IMAGE         COMMAND       CREATED         ...   NAMES
+  77d9619a7a71  ubuntu:14.04  "/bin/bash"   10 seconds ago  ...   high_shockley
+  $ docker export 77d9619a7a71 > update.tar
+  $ ls
+  update.tar
+```
+
+Se puede hacer `commit` de este contenedor como una nueva imagen local, pero tambien se podría usar el comando `import`:
+
+
+```
+  $ docker import - update < update.tar
+  157bcbb5fdfce0e7c10ef67ebdba737a491214708a5f266a3c74aa6b0cfde078
+  $ docker images
+  REPOSITORY  TAG     IMAGE ID      ...   VIRTUAL SIZE
+  update      latest  157bcbb5fdfc  ...   188.1 MB
+```
+
+Si se quiere compartir esta imagen con uno de sus colaboradores, podría subirse el tarball a un webserver y decirle al colaborar que descarga tal, y use el comando `import` en su Docker Host.
+Si se prefiere usar imagenes que ya se han comitiado, se puede usar los comandos `load` y `save` mencionados anteriormente.
+
+Entonces, **¿Cuál es la diferencia?**
+
+Los 2 métodos son similares; La diferencia está en que guardando una imagen mantenemos el historial de cambios, y exportándola como contenedor NO.
+
+*A mi punto de vista, tal vez lo mejor sería sólo mantener los cambios cuando ya es algo en producción y deseamos hacer actualización de software. Por ejemplo del SO o de APACHE/NGINX, donde si ocurre una falla o incompatibilidad, podría volverse atrás. En cambio mientras estamos haciendo el desarrollo, mantener los cambios tal vez no sea tan importante.*
