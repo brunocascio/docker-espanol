@@ -17,18 +17,6 @@
 
 ## Empezando
 
-### `ps`
-
-Muestra los contenedores en ejecución (los que están corriendo en 2do plano).
-
-```
-  $ docker ps
-```
-
-Si lo ejecutamos luego del comando anterior, no mostrará nada porque lo anterior era solo un `build, run, die`.
-
-Para ver el historial de ejecución y los contnedores actualmente creados (corriendo o no), ejecutamos:
-
 ```
   $ docker ps -a
 ```
@@ -60,6 +48,19 @@ Corremos un contenedor con la *imagen* base `busybox`, que ejecuta el comando `e
 ```
   $ docker run busybox echo hello world
 ```
+
+### `ps`
+
+Muestra los contenedores en ejecución (los que están corriendo en 2do plano).
+
+```
+  $ docker ps
+```
+
+Si lo ejecutamos luego del comando anterior, no mostrará nada porque lo anterior era solo un `build, run, die`.
+
+Para ver el historial de ejecución y los contnedores actualmente creados (corriendo o no), ejecutamos:
+
 
 ### `run` avanzado
 
