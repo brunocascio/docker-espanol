@@ -17,12 +17,6 @@
 
 ## Empezando
 
-```
-  $ docker ps -a
-```
-
-Esto nos mostrará todos los contendores que se encuentran creados hasta el momento. Podes borrarlos si quisieramos `docker rm <container-id>`
-
 ### `images`
 
 Muestra las imagenes locales disponibles.
@@ -61,6 +55,11 @@ Si lo ejecutamos luego del comando anterior, no mostrará nada porque lo anterio
 
 Para ver el historial de ejecución y los contnedores actualmente creados (corriendo o no), ejecutamos:
 
+```
+  $ docker ps -a
+```
+
+Esto nos mostrará todos los contendores que se encuentran creados hasta el momento. Podes borrarlos si quisieramos `docker rm <container-id>`
 
 ### `run` avanzado
 
