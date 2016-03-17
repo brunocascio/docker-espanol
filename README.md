@@ -614,3 +614,121 @@ Entonces, **¿Cuál es la diferencia?**
 Los 2 métodos son similares; La diferencia está en que guardando una imagen mantenemos el historial de cambios, y exportándola como contenedor NO.
 
 *A mi punto de vista, tal vez lo mejor sería sólo mantener los cambios cuando ya es algo en producción y deseamos hacer actualización de software. Por ejemplo del SO o de APACHE/NGINX, donde si ocurre una falla o incompatibilidad, podría volverse atrás. En cambio mientras estamos haciendo el desarrollo, mantener los cambios tal vez no sea tan importante.*
+
+## Escribiendo Nuestro primer DockerFile
+
+**Problema:**
+
+Ejecutar contenedores en modo interactivo, hacer algunos cambios y para luego comitear estos en una nueva imagen, funciona bien. Pero en la mayoría de los casos, tal vez quieras automatizar este proceso de creación de nuestra propia imagen y compartir estos pasos con otros.
+
+**Solution:**
+
+Para automatizar el proceso de creación de imágenes Docker, prepararemos tales paso en un archivo de manifiesto, llamado **Dockerfile**.
+Este archivo de texto está compuesto por una serie de instrucciones que describe cual es la *imagen base* de la que el nuevo contenedor se basará, que pasos necesitan llevarse a cabo para instalar las *dependencias* de la aplicación, qué *archivos* necesitan estar presentes en la imagen, qué puertos serán *expuestos* por el contenedor y que *comando* ejecutar cuando se ejecuta el contenedor, entre otras cosas.
+
+Para ilustrar esto, crearemos un simple Dockerfile. La **imagen** resultante nos permitirá crear un contenedor que ejecuta el comando `/bin/echo`.
+
+```
+FROM ubuntu:14.04
+
+ENTRYPOINT ["/bin/echo"]
+```
+
+La instrucción `FROM` dice de que **imagen base** partimos para crear la nuestra. En este caso `ubuntu:14.04`, que la primera vez será descargada del repositorio del *Docker Hub*.
+
+La instrucción `ENTRYPOINT` dice cual es el comando a ejecutar cuando el contendor basado en esta imagen, sea ejecutado.
+
+Para hacer `build` de esta imagen, ejecutamos `docker build .`
+
+Hecho el build, ejecutamos un nuevo contenedor a partir de esta imagen:
+
+`docker images`
+
+```
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+<none>              <none>              99fac58824c2        5 minutes ago       187.9 MB
+
+```
+
+```
+docker run 99fac58824c2 Hi Docker!
+Hi Docker !
+```
+
+Lo que hemos hecho es ejecutar un contenedor a partir de la imagen previamente creada, pasándole como argumento `Hi Docker!`.
+El contenedor al ejecutarse, corrió el comando definido por el `ENTRYPOINT`, seguido por el argumento anteriormente mencionado.
+Una vez que el comando ha **finalizado** (la tarea finaliza), el contenedor es finalizado también.
+
+Tambien podemos usar la instrucción `CMD` en un Dockerfile. Esta tiene la ventaja que se puede sobreescribir cuando este se ejecuta, pasándolo como argumento. Por ejemplo:
+
+```
+FROM ubuntu:14.04
+
+CMD ["/bin/echo" , "Hi Docker !"]
+```
+
+Construimos la nueva imagen:
+
+`docker build .` 
+
+Ejecutamos un contenedor a partir de esta:
+
+```
+docker run 99fac58824c2
+Hi Docker!
+```
+
+Y ahora sobreescribiendo el comando:
+
+```
+docker run 99fac58824c2 /bin/date
+Thu Mar 17 00:14:00 UTC 2016
+```
+
+Si el Dockerfile utiliza la instrucción `ENTRYPOINT` y necesitamos hacer override, se le puede pasar la opción `--entrypoint` al `docker run`.
+
+Tenemos una imagen creada, pero como verán no tiene un `tag` y siempre nos referimos a ella por su `IMAGE ID`.
+Para esto podemos hacer un rebuild usando la opción `-t`.
+
+```
+$ docker build -t ubuntu-echo:1.0.0 .
+...
+...
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+ubunntu-echo        1.0.0 	        99fac58824c2        About an hour ago   187.9 MB
+...
+```
+
+Podemos colocarle el nombre que querramos, pero siempre es mejor seguir las convenciones :)
+
+`<name-of-recipe>:<version-of-recipe>`
+
+El comando `build` tiene una serie de opciones configurables y pueden verse con la opcion -h
+
+```
+$ docker build -h
+
+Usage:	docker build [OPTIONS] PATH | URL | -
+
+Build an image from a Dockerfile
+
+  --build-arg=[]                  Set build-time variables
+  --cpu-shares=0                  CPU shares (relative weight)
+  --cgroup-parent=                Optional parent cgroup for the container
+  --cpu-period=0                  Limit the CPU CFS (Completely Fair Scheduler) period
+  --cpu-quota=0                   Limit the CPU CFS (Completely Fair Scheduler) quota
+  --cpuset-cpus=                  CPUs in which to allow execution (0-3, 0,1)
+  --cpuset-mems=                  MEMs in which to allow execution (0-3, 0,1)
+  --disable-content-trust=true    Skip image verification
+  -f, --file=                     Name of the Dockerfile (Default is 'PATH/Dockerfile')
+  --force-rm=false                Always remove intermediate containers
+  --help=false                    Print usage
+  -m, --memory=                   Memory limit
+  --memory-swap=                  Total memory (memory + swap), '-1' to disable swap
+  --no-cache=false                Do not use cache when building the image
+  --pull=false                    Always attempt to pull a newer version of the image
+  -q, --quiet=false               Suppress the verbose output generated by the containers
+  --rm=true                       Remove intermediate containers after a successful build
+  -t, --tag=                      Repository name (and optionally a tag) for the image
+  --ulimit=[]                     Ulimit options
+```
