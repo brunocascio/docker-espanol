@@ -13,7 +13,7 @@
 
 ## Instalación
 
-  . . . . TODO . . . .
+La instalación puede seguirse desde la [Documentación Oficial](https://docs.docker.com/engine/installation/).
 
 ## Empezando
 
