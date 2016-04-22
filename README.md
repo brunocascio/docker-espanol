@@ -669,7 +669,7 @@ CMD ["/bin/echo" , "Hi Docker !"]
 
 Construimos la nueva imagen:
 
-`docker build .` 
+`docker build .`
 
 Ejecutamos un contenedor a partir de esta:
 
@@ -731,4 +731,102 @@ Build an image from a Dockerfile
   --rm=true                       Remove intermediate containers after a successful build
   -t, --tag=                      Repository name (and optionally a tag) for the image
   --ulimit=[]                     Ulimit options
+```
+
+## Empaquetando una aplicación Flask en un contenedor
+
+**Problema**
+
+Tenemos una aplicación web buildeada en **Flask** corriendo en nuestro Ubuntu 14.04 y queremos correrla en un contenedor.
+
+**Solución**
+
+Como un ejemplo, vamos a usar una simple aplicacion [Flask Hello World](http://flask.pocoo.org/)
+
+Para instalar el modulo Flask simplemente corremos este comando
+
+`$ pip install Flask`
+
+
+```
+#!/usr/bin/env python
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+  return "Hello World!"
+
+if __name__ == "__main__":
+  app.run(host='0.0.0.0', port=5000)
+```
+
+Para tener esta aplicación corriendo en un contenedor Docker, necesitamos escribir un `Dockerfile` que instale las dependencias de este framework (comando `RUN`), y poder correr nuesta app. Tambien necesitamos exponer el puerto del contenedor (comando `EXPOSE`).
+Tambien necesitamos mover nuestra aplicación al Filesystem del contendor (comando `ADD`).
+El Dockerfile quedaría de la siguiente forma:
+
+```
+  FROM ubuntu:14.04
+
+  # Actualizamos repositorios e instalamos dependencias.
+  RUN apt-get update
+  RUN apt-get install -y python python-pip
+  RUN apt clean all
+  RUN pip install flask
+
+  # Agregamos nuestra aplicación al Filesystem del contenedor.
+  ADD hello.py /tmp/hello.py
+
+  # Exponemos el puerto del contenedor
+  EXPOSE 5000
+
+  # Comando por default que se ejecuta cuando se corre el contenedor
+  CMD ["python","/tmp/hello.py"]
+```
+
+**Nota**: Este Dockerfile no está optimizado, intencionalmente. Para optimizarlo lo veremos más adelante, pero esto sólo es para entender lo básico.
+
+El comando `RUN` permite ejecutar comandos específicos durante el *build* de la imagen del contenedor.
+Para copiar nuestra aplicacion dentro de la imagen del contenedor, usamos el comando `ADD`. En nuestro caso, copia el archivo `hello.py` al directorio `/tmp` de la imagen del contenedor.
+La aplicación usa el puerto `5000`, y tenemos que *exponer* este puerto al Docker Host.
+Finalmente, el comando `CMD` especifica que el contenedor debe ejecutar `python /tmp/hello.py` cuando se ejecute.
+
+Procedemos a hacer *build* de la imagen.
+
+`$ docker build -t flask .`
+
+Esto creó una imagen Docker *flask*:
+
+```
+$ docker images
+REPOSITORY    TAG       IMAGE ID        CREATED         VIRTUAL SIZE
+flask         latest    d381310506ed    3 seconds ago   354.6 MB
+...
+```
+
+Para correr esta aplicación usaremos la opción `-d`, la cual *daemonizará* el contenedor. Tambien pasaremos el argumento `-P` para decirlo a Docker que elija un puerto en el Docker Host para *forwardear* al puerto expuesto por el contenedor.
+
+```
+$ docker run -d -P flask
+5ac72ed12a72f0e2bec0001b3e78f11660905d20f40e670d42aee292263cb890
+```
+
+```
+  $ docker ps
+  CONTAINER ID    IMAGE           COMMAND                  ...   PORTS
+  5ac72ed12a72    flask:latest    "python /tmp/hello.py    ...   0.0.0.0:49153->5000/tcp
+```
+
+El contendor retornado, está *daemonizado* y no con nosotros logueados en una shell interativa dentro. La sección PORTS nos muestra el mapeo de puertos del contendor en cuestión. En este caso mapea el puerto 49153 del **Docker Host** al puerto 5000 del **contenedor**. Si ahora ingresamos en http://localhost:49153, deberíamos ver el mensaje de `hello world!`.
+
+**Nota:** Notar que no se le pasó un comando a ejecutar en el comando `run`, esto se debe a que ejecutará el `CMD` definido  en el Dockerfile. También podriamos sobreescribir el comando, por ejemplo:
+
+```
+$ docker run -d -P flask /bin/bash
+root@fc1514ced93e:/# ls -l /tmp
+total 4
+-rw-r--r-- 1 root root 194 Dec 8 13:41 hello.py
+root@fc1514ced93e:/#
 ```
