@@ -1,8 +1,8 @@
 FROM ubuntu:14.04
 
 # Actualizamos repositorios e instalamos dependencias.
-RUN apt update
-RUN apt install -y python python-pip
+RUN apt-get update
+RUN apt-get install -y python python-pip htop
 RUN apt-get clean all
 RUN pip install flask
 

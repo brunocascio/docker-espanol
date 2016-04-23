@@ -830,3 +830,88 @@ total 4
 -rw-r--r-- 1 root root 194 Dec 8 13:41 hello.py
 root@fc1514ced93e:/#
 ```
+
+### Optimizando el Dockerfile siguiendo buenas prácticas
+
+**Problema**
+
+Se quiere seguir las buenas pŕacticas para crear Dockerfiles y optimizar las imágenes Docker.
+
+**Solución**
+
+Docker expone en su documentación [una sección de buenas prácticas](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/) para ecribir Dockerfiles. Estas pŕacticas nos ayudaran a crear imágenes de forma más eficiente, modulares y con menor esfuerzo.
+
+Estas son algunas instrucciones para crear buenas `Docker Images`.
+
+1. Ejecutar un único proceso por contenedor. De todas formas podríamos correr multiples procesos por contendor, como se vió cuando usamos `supervisor`. En este caso, `supervisor` es el único proceso de cara al contenedor, pero éste levanta internamente otros procesos. Seguir la práctica de un único proceso por contenedor, nos permite hacer aplicaciones desacopladas que podrían escalar. Esto nos permite ademas usar *container links* u otras técnicas de *container networking* que veremos más adelante.
+
+2. No asumir que nuestros contenedores estarán siempre corriendo; Estos son efímeros y serán parados y reiniciados. Se debería tratarlos como entidades inmutables, lo que significa que no deberíamos modificarlos mientras estan en ejecución, sino modificar el Dockerfile reconstruir la imagen y levantar un contenedor con esa imagen actualizada.
+Por lo tanto, se recomienda manejar datos y configuraciones de ejecución fuera del contenedor y por lo tanto de su imagen.
+Para esto, usamos `Docker Volumes`.
+
+3. Usar un archivo `.dockerignore`. Cuando creamos imagenes, Docker copiará el contenido del *working directory* donde se encuentra el Dockerfile, dentro de la imagen. Con los archivos `.dockerignore` obtenemos un funcionamiento como el `.gitignore` y basicamente lo que logramos es excluir archivos (basura o sensibles) que no queremos que estén dentro de la imagen. El uso del `.dockerignore` es opcional, pero si no lo usamos, aseguremosnos de copiar lo mínimo y necesario. Podemos chequear la syntaxis del mismo en este [link](https://docs.docker.com/engine/reference/builder/#dockerignore-file).
+
+4. Usar imágenes oficiales del Docker Hub, en lugar de escribiar las nuestras desde cero. Estas imágenes están mantenidas por quienes las empresas autoras de ese software. Tambien podemos usar `ONBUILD images`, para simplicar el proceso de creación de nuestras imagenes.
+
+5. Finalmente, y de los más importantes, minimizar el número de capas de nuestras imágenes usando la caché de imagen. Docker usa [union filesystems](https://es.wikipedia.org/wiki/UnionFS) para almacenar las imágenes. Esto quiere decir que cada imagen se hace a partir de una imagen base más una colección de *diffs* que agregan los cambios requeridos. Cada *diff* representa una capa adicional en una imagen. Esto tiene un impacto directo en como nosotros escribimos nuestro Dockerfile y las directivas que usamos.
+En la sección siguiente veremos este punto.
+
+Con estos puntos, haremos unos pequeños cambios en la imagen creada en la sección anterior:
+
+Tenemos el Dockerfle de esta forma:
+
+```
+  FROM ubuntu:14.04
+
+  # Actualizamos repositorios e instalamos dependencias.
+  RUN apt-get update
+  RUN apt-get install -y python python-pip
+  RUN apt clean all
+  RUN pip install flask
+
+  # Agregamos nuestra aplicación al Filesystem del contenedor.
+  ADD hello.py /tmp/hello.py
+
+  # Exponemos el puerto del contenedor
+  EXPOSE 5000
+
+  # Comando por default que se ejecuta cuando se corre el contenedor
+  CMD ["python","/tmp/hello.py"]
+```
+
+Aplicamos unos cambios:
+
+```
+  FROM ubuntu:14.04
+
+  RUN apt-get update && apt-get install -y \
+    python
+    python-pip
+
+  RUN pip install flask
+
+  COPY hello.py /tmp/hello.py
+
+  EXPOSE 5000
+
+  CMD ["python","/tmp/hello.py"]
+```
+
+Usar multiples comandos `RUN` es una mala práctica, ya que genera una nueva capa por cada uno. También cambiamos el comando `ADD` por `COPY` ya que `ADD` es para operaciones de copiado más complejas, y nosotros sólo copiamos de manera simple.
+
+Aun así podríamos aplicar más optimizaciones como la siguiente:
+
+```
+  FROM python:2.7.10
+
+  RUN pip install flask
+
+  COPY hello.py /tmp/hello.py
+
+  EXPOSE 5000
+
+  CMD ["python","/tmp/hello.py"]
+```
+
+Entre los cambios, se puede ver que cambiamos a `ubuntu` por `python` como *imagen base* (aplicando el punto `2.` de optimizaciónes). Eliminando toda la instalación de dependencias para python.
+Estas optimizaciones aun podrían ser más optimizables como por ejemplo usar la imagen base de `Flask`, pero la idea es que se note la diferencia entre un `Dockerfile` y otro optimizado.
