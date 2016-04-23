@@ -824,7 +824,7 @@ El contendor retornado, está *daemonizado* y no con nosotros logueados en una s
 **Nota:** Notar que no se le pasó un comando a ejecutar en el comando `run`, esto se debe a que ejecutará el `CMD` definido  en el Dockerfile. También podriamos sobreescribir el comando, por ejemplo:
 
 ```
-$ docker run -d -P flask /bin/bash
+$ docker run -t -i -P flask /bin/bash
 root@fc1514ced93e:/# ls -l /tmp
 total 4
 -rw-r--r-- 1 root root 194 Dec 8 13:41 hello.py
