@@ -806,7 +806,7 @@ flask         latest    d381310506ed    3 seconds ago   354.6 MB
 ...
 ```
 
-Para correr esta aplicación usaremos la opción `-d`, la cual *daemonizará* el contenedor. Tambien pasaremos el argumento `-P` para decirlo a Docker que elija un puerto en el Docker Host para *forwardear* al puerto expuesto por el contenedor.
+Para correr esta aplicación usaremos la opción `-d`, la cual *daemonizará* el contenedor. Tambien pasaremos el argumento `-P` para decirle a Docker que elija un puerto en el *Docker Host* para *forwardear* al puerto expuesto por el contenedor.
 
 ```
 $ docker run -d -P flask
@@ -819,7 +819,7 @@ $ docker run -d -P flask
   5ac72ed12a72    flask:latest    "python /tmp/hello.py    ...   0.0.0.0:49153->5000/tcp
 ```
 
-El contendor retornado, está *daemonizado* y no con nosotros logueados en una shell interativa dentro. La sección PORTS nos muestra el mapeo de puertos del contendor en cuestión. En este caso mapea el puerto 49153 del **Docker Host** al puerto 5000 del **contenedor**. Si ahora ingresamos en http://localhost:49153, deberíamos ver el mensaje de `hello world!`.
+El contendor retornado, está *daemonizado* y no con nosotros logueados en una shell interativa dentro. La sección PORTS nos muestra el mapeo de puertos del contendor en cuestión. En este caso mapea el puerto 49153 del **Docker Host** al puerto 5000 del **contenedor**. Si ahora ingresamos en [http://localhost:49153](http://localhost:49153), deberíamos ver el mensaje `hello world!`.
 
 **Nota:** Notar que no se le pasó un comando a ejecutar en el comando `run`, esto se debe a que ejecutará el `CMD` definido  en el Dockerfile. También podriamos sobreescribir el comando, por ejemplo:
 
