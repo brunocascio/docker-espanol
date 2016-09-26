@@ -252,7 +252,7 @@ Creamos el Dockerfile, con este contenido:
   CMD ["/usr/bin/supervisord"]
 ```
 
-Creamos el archivo `supervisor.conf` con este contenido:
+Creamos el archivo `supervisord.conf` con este contenido:
 
 ```
 [supervisord]
