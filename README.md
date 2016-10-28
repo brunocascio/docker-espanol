@@ -922,25 +922,38 @@ Con todo lo descrito anteriormente ya se puede empezar a trabajar con Docker y t
 
 Configuración de bridges:
 
+```
 --bridge=BRIDGE
 
+```
 Activar la comunicación entre contenedores:
 
+```
 --icc=true|false
 
+```
 Especificar la IP a la que responderá el contenedor:
 
+```
 --ip=IP_ADDRESS
 
+```
 Habilitar IP Forwarding:
 
+```
 --ip-forward=true|false
 
+```
 Habilitar iptables:
 
+```
 --iptables=true|false
 
+```
 Especificar DNS y dominio de búsqueda DNS:
 
+```
 --dns=IP_ADDRESS
 --dns-search=DOMAIN
+
+```
