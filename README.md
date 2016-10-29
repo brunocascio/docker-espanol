@@ -915,3 +915,45 @@ Aun así podríamos aplicar más optimizaciones como la siguiente:
 
 Entre los cambios, se puede ver que cambiamos a `ubuntu` por `python` como *imagen base* (aplicando el punto `2.` de optimizaciones). Eliminando toda la instalación de dependencias para python.
 Estas optimizaciones aún podrían ser más optimizables como, por ejemplo, usar la imagen base de `Flask`, pero la idea es que se note la diferencia entre un `Dockerfile` y otro optimizado.
+
+### Configuración avanzada de red
+
+Con todo lo descrito anteriormente ya se puede empezar a trabajar con Docker y tener una visión de como funciona. A partir de aquí es interesante conocer como funciona la configuración avanzada de red en la cual podemos, entre otras cosas, especificar un bridge de conexión para el contenedor, activar la comunicación entre contenedores, configuración de IPTABLES, DNS, IP, etc. Estos son algunos de los parámetros disponibles a la hora de arrancar el contenedor que establecen estas configuraciones:
+
+Configuración de bridges:
+
+```
+--bridge=BRIDGE
+
+```
+Activar la comunicación entre contenedores:
+
+```
+--icc=true|false
+
+```
+Especificar la IP a la que responderá el contenedor:
+
+```
+--ip=IP_ADDRESS
+
+```
+Habilitar IP Forwarding:
+
+```
+--ip-forward=true|false
+
+```
+Habilitar iptables:
+
+```
+--iptables=true|false
+
+```
+Especificar DNS y dominio de búsqueda DNS:
+
+```
+--dns=IP_ADDRESS
+--dns-search=DOMAIN
+
+```
