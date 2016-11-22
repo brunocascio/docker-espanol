@@ -45,7 +45,7 @@ Corremos un contenedor con la *imagen* base `busybox`, que ejecuta el comando `e
 
 ### `ps`
 
-Muestra los contenedores en ejecución (los que están corriendo en segundo plano).
+Muestra los contenedores en ejecución (running).
 
 ```
   $ docker ps
