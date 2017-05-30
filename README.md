@@ -76,7 +76,7 @@ Probemos de ejecutar y usar una terminal en el contenedor:
   $ docker run -t -i ubuntu:14.04 /bin/bash
 ```
 
-  * `-t`: Aloca una tty
+  * `-t`: Asigna una tty
   * `-i`: Nos comunicamos con el contenedor de modo interactivo.
 
 **NOTA:** Al salir del modo interactivo el contenedor se detendrá.
@@ -146,7 +146,7 @@ Ya entendemos cómo se descargan las imágenes del *Docker Registry*. ¿Qué pas
 **Solución:**
 
 Usando un [Dockerfile](https://docs.docker.com/engine/reference/builder/). Un `Dockerfile` es un archivo de texto, que describe los pasos (secuenciales) a seguir para preparar una imagen Docker. Esto incluye instalación de paquetes, creación de directorios, definición de variables de entorno, ETC.
-Toda imagen que creemos, parte de una *base image*. Como en otro de los ejemplos, usábamos la imagen [busybox](https://busybox.net/about.html) la cual combina utilidades UNIX en un único y simple ejecutable.
+Toda imagen que creemos, parte de una *base image*. Como en otro de los ejemplos, usaremos la imagen [busybox](https://busybox.net/about.html) la cual combina utilidades UNIX en un único y simple ejecutable.
 
 **Comenzando:**
 
