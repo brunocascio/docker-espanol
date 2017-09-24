@@ -504,7 +504,7 @@ $ docker inspect -f {{.Mounts}} cont2
 
 **Problema:**
 
-Tenemos un contenedor que no tiene volúmenes cofigurados, y queremos copiar archivos desde y en el contenedor.
+Tenemos un contenedor que no tiene volúmenes configurados, y queremos copiar archivos desde y en el contenedor.
 
 **Solución:**
 
