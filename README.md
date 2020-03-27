@@ -9,7 +9,10 @@
 
 ## Introducción
 
- . . . . TODO . . . .
+La idea de Docker, es la de crear aplicaciones/servicios que sean independientes y portables. Esto es, no importa que sistema operativo utilices o con que hardware cuentas, si puedes instalar docker, entonces podras correr tus contenedores en él.
+Entre las ventajas de usar docker, se encuentra la de olvidarte de instalar dependencias (ejemplo nodejs, java, python, ruby, etc) dentro de tu host o servidor y sin utilizar máquinas virtuales. A lo largo de este documento, iremos viendo el ecosistema de Docker y como todo se relaciona.
+
+Docker posibilita ir de tu maquina local a producción, con tu aplicació lista. Ya no es necesario instalar en cada servidor dependencias o depender del sistema operativo. Solo basta con tener Docker instalado.
 
 ## Instalación
 
