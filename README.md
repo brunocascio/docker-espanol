@@ -177,7 +177,7 @@ Creamos el Dockerfile:
 
 Escribimos las siguientes líneas dentro del `Dockerfile`:
 
-```docker
+```Dockerfile
 FROM busybox
 
 ENV foo=bar
@@ -209,7 +209,7 @@ Veremos diferentes formas de hacer esto. En principio crearemos todo dentro de u
 
 Creamos el Dockerfile, con este contenido:
 
-```docker
+```Dockerfile
   # Imagen Base
   FROM ubuntu:14.04
 
@@ -653,7 +653,7 @@ Este archivo de texto está compuesto por una serie de instrucciones que describ
 
 Para ilustrar esto, crearemos un simple Dockerfile. La **imagen** resultante nos permitirá crear un contenedor que ejecuta el comando `/bin/echo`.
 
-```docker
+```Dockerfile
 FROM ubuntu:14.04
 
 ENTRYPOINT ["/bin/echo"]
@@ -686,7 +686,7 @@ Una vez que el comando ha **finalizado** (la tarea finaliza), el contenedor es f
 
 Tambien podemos usar la instrucción `CMD` en un Dockerfile. Esta tiene la ventaja que se puede sobreescribir cuando este se ejecuta, pasándolo como argumento. Por ejemplo:
 
-```docker
+```Dockerfile
 FROM ubuntu:14.04
 
 CMD ["/bin/echo" , "Hi Docker !"]
@@ -791,7 +791,7 @@ Para tener esta aplicación corriendo en un contenedor Docker, necesitamos escri
 También necesitamos mover nuestra aplicación al Filesystem del contenedor (comando `ADD`).
 El Dockerfile quedaría de la siguiente forma:
 
-```docker
+```Dockerfile
   FROM ubuntu:14.04
 
   # Actualizamos repositorios e instalamos dependencias.
@@ -884,7 +884,7 @@ Con estos puntos, haremos unos pequeños cambios en la imagen creada en la secci
 
 Tenemos el Dockerfle de esta forma:
 
-```docker
+```Dockerfile
   FROM ubuntu:14.04
 
   # Actualizamos repositorios e instalamos dependencias.
@@ -905,7 +905,7 @@ Tenemos el Dockerfle de esta forma:
 
 Aplicamos unos cambios:
 
-```docker
+```Dockerfile
   FROM ubuntu:14.04
 
   RUN apt-get update && apt-get install -y \
@@ -925,7 +925,7 @@ Usar múltiples comandos `RUN` es una mala práctica, ya que genera una nueva ca
 
 Aun así podríamos aplicar más optimizaciones como la siguiente:
 
-```docker
+```Dockerfile
   FROM python:2.7.10
 
   RUN pip install flask
