@@ -1,11 +1,13 @@
 # Docker
+
 ---
 
 ## Conceptos importantes:
-  - Docker (daemon)
-  - Docker-machine (client)
-  - Docker Images
-  - Docker Containers
+
+- Docker (daemon)
+- Docker-machine (client)
+- Docker Images
+- Docker Containers
 
 ## Introducción
 
@@ -40,7 +42,7 @@ Podemos ver en tiempo real, los eventos que Docker lanza en nuestro servidor, so
 
 ### `run`
 
-Corremos un contenedor con la *imagen* base `busybox`, que ejecuta el comando `echo hello world` dentro. Luego de esto, el contenedor se detendrá, porque de esta forma funciona como un "job".
+Corremos un contenedor con la _imagen_ base `busybox`, que ejecuta el comando `echo hello world` dentro. Luego de esto, el contenedor se detendrá, porque de esta forma funciona como un "job".
 
 ```
   $ docker run busybox echo hello world
@@ -71,6 +73,7 @@ Podemos pasar muchas opciones al comando `run`, las cuales podemos ver con:
 ```
   $ docker run --help
 ```
+
 #### `run` interactivo
 
 Probemos de ejecutar y usar una terminal en el contenedor:
@@ -79,8 +82,8 @@ Probemos de ejecutar y usar una terminal en el contenedor:
   $ docker run -t -i ubuntu:14.04 /bin/bash
 ```
 
-  * `-t`: Asigna una tty
-  * `-i`: Nos comunicamos con el contenedor de modo interactivo.
+- `-t`: Asigna una tty
+- `-i`: Nos comunicamos con el contenedor de modo interactivo.
 
 **NOTA:** Al salir del modo interactivo el contenedor se detendrá.
 
@@ -102,7 +105,7 @@ La opción `-d` hace que el contenedor corra en segundo plano. Esto nos permite 
 
 `$ docker exec -ti <container-id> /bin/bash`
 
-Aquí simplemente se abre una `tty` en modo `interativo`. Podrían hacerse otras cosas como cambiar el *working directory*, setear *variables de entorno*, etc. La lista completa puede verse [acá](https://docs.docker.com/reference/run/)
+Aquí simplemente se abre una `tty` en modo `interativo`. Podrían hacerse otras cosas como cambiar el _working directory_, setear _variables de entorno_, etc. La lista completa puede verse [acá](https://docs.docker.com/reference/run/)
 
 ## Ciclo de vida de un contenedor
 
@@ -129,31 +132,40 @@ $ docker ps
 
 Siguiendo el ejemplo, para detener el contenedor se puede ejecutar cualquiera de los siguientes comandos:
 
-  * `$ docker kill a842945e2414` (envía SIGKILL)
-  * `$ docker stop a842945e2414` (envía SIGTERM).
+```bash
+  docker kill a842945e2414 # (envía SIGKILL)
+```
 
-Así mismo, pueden reiniciarse (hace un `docker stop a842945e2414` y luego un `docker start a842945e2414`):
+```bash
+  docker stop a842945e2414 # (envía SIGTERM).
+```
 
-`$ docker restart a842945e2414`
+Así mismo, pueden reiniciarse:
+
+```bash
+  docker restart a842945e2414
+```
 
 o destruirse:
 
-`$ docker rm a842945e2414`
+```bash
+  docker rm a842945e2414
+```
 
 ## Crear una imagen Docker con un Dockerfile
 
 **Problema:**
 
-Ya entendemos cómo se descargan las imágenes del *Docker Registry*. ¿Qué pasa si ahora quisiéramos armar nuestras propias imagenes? (Para compartir, obvio 😜)
+Ya entendemos cómo se descargan las imágenes del _Docker Registry_. ¿Qué pasa si ahora quisiéramos armar nuestras propias imagenes? (Para compartir, obvio 😜)
 
 **Solución:**
 
 Usando un [Dockerfile](https://docs.docker.com/engine/reference/builder/). Un `Dockerfile` es un archivo de texto, que describe los pasos (secuenciales) a seguir para preparar una imagen Docker. Esto incluye instalación de paquetes, creación de directorios, definición de variables de entorno, ETC.
-Toda imagen que creemos, parte de una *base image*. Como en otro de los ejemplos, usaremos la imagen [busybox](https://busybox.net/about.html) la cual combina utilidades UNIX en un único y simple ejecutable.
+Toda imagen que creemos, parte de una _base image_. Como en otro de los ejemplos, usaremos la imagen [busybox](https://busybox.net/about.html) la cual combina utilidades UNIX en un único y simple ejecutable.
 
 **Comenzando:**
 
-Crearemos nuestra propia imagen con la imagen base *busybox* y setearemos sólo una variable de entorno para mostrar el funcionamiento.
+Crearemos nuestra propia imagen con la imagen base _busybox_ y setearemos sólo una variable de entorno para mostrar el funcionamiento.
 
 El siguiente comando crea el directorio pepe y se posiciona dentro de él:
 
@@ -170,6 +182,7 @@ FROM busybox
 
 ENV foo=bar
 ```
+
 Hecho esto, haremos un `build` de la imagen con el nombre `my-busybox`:
 
 `$ docker build -t my-busybox .` (Chequear el . al final)
@@ -178,19 +191,19 @@ Si todo salió bien al hacer `docker images`, deberíamos encontrar nuestra imag
 
 ## Ejemplo Real: Wordpress Dockerizado.
 
-*Es un setup básico, no lo usaría en producción :)*
+_Es un setup básico, no lo usaría en producción :)_
 
 Para esto usaremos MySql y HTTPD (apache o nginx).
 
 **Problema:**
 
-Como Docker ejecuta procesos en *foreground*, necesitamos encontrar la forma de ejecutar varios de estos simultáneamente. La directiva `CMD` que veremos más adelante, sólo ejecutará una instrucción. Es decir, si tenemos varios `CMD` dentro de un *Dockerfile*, ejecutará sólo el último.
+Como Docker ejecuta procesos en _foreground_, necesitamos encontrar la forma de ejecutar varios de estos simultáneamente. La directiva `CMD` que veremos más adelante, sólo ejecutará una instrucción. Es decir, si tenemos varios `CMD` dentro de un _Dockerfile_, ejecutará sólo el último.
 
 **Solución:**
 
 Usando [Supervisor](http://supervisord.org/index.html) para monitorear y ejecutar MySql y HTTPD. Supervisor se encarga de controlar varios procesos y se ejecuta como cualquier otro programa.
 
-Veremos diferentes formas de hacer esto. En principio crearemos todo dentro de un único contenedor, pero luego explotaremos al máximo los principios y características de Docker para hacerlo, por ejemplo separar servicios en diferentes contenedores y *linkearlos*.
+Veremos diferentes formas de hacer esto. En principio crearemos todo dentro de un único contenedor, pero luego explotaremos al máximo los principios y características de Docker para hacerlo, por ejemplo separar servicios en diferentes contenedores y _linkearlos_.
 
 ### Usando Supervisor y en un único contenedor
 
@@ -373,7 +386,7 @@ Usar Supervisor para ejecutar varios servicios dentro del mismo contenedor, podr
 
 **Problema:**
 
-Hasta ahora ejecutamos una instancia de wordpress con su servidor y su base de datos, en un mismo contenedor. El problema es que no explotamos al máximo a Docker, y no mantenemos tampoco el concepto de *Separation of concerns*. Necesitamos desacoplar el contenedor lo más fino posible.
+Hasta ahora ejecutamos una instancia de wordpress con su servidor y su base de datos, en un mismo contenedor. El problema es que no explotamos al máximo a Docker, y no mantenemos tampoco el concepto de _Separation of concerns_. Necesitamos desacoplar el contenedor lo más fino posible.
 
 **Solución:**
 
@@ -401,14 +414,14 @@ $ docker run --name mysqlwp -e MYSQL_ROOT_PASSWORD=wordpressdocker \
 
 NOTA: Aquí hay nuevas opciones:
 
-  * `-e` es para setear variables de entorno. Esas variables están definidas dentro del Dockerfile de MySql, por lo que nosotros le damos valor, para que el contenedor a ejecutar, use esos datos.
-  * `-v` es para montar un volumen entre el host y el contenedor. En este caso en el host se populará el volumen `/db/mysql/` con la info de `/var/lib/mysql`.
-    * Los volúmenes tienen diferentes usos:
-      * Se crean cuando se inicializa el contenedor
-      * Compartir información entre diferentes contenedores
-      * Mantener la info luego de haber borrado el contenedor
-      * Cambios en los volúmenes son directamente aplicados (no hay que hacer nada adicional con el contenedor para actualizar)
-      * Los cambios de un volumen no se incluirán en la actualización de la imagen  
+- `-e` es para setear variables de entorno. Esas variables están definidas dentro del Dockerfile de MySql, por lo que nosotros le damos valor, para que el contenedor a ejecutar, use esos datos.
+- `-v` es para montar un volumen entre el host y el contenedor. En este caso en el host se populará el volumen `/db/mysql/` con la info de `/var/lib/mysql`.
+  - Los volúmenes tienen diferentes usos:
+    - Se crean cuando se inicializa el contenedor
+    - Compartir información entre diferentes contenedores
+    - Mantener la info luego de haber borrado el contenedor
+    - Cambios en los volúmenes son directamente aplicados (no hay que hacer nada adicional con el contenedor para actualizar)
+    - Los cambios de un volumen no se incluirán en la actualización de la imagen
 
 **Ejecutamos y linkeamos a wordpress**
 
@@ -442,12 +455,12 @@ Ahora, para hacer un backup de la base de datos de ese contenedor ejecutamos:
 
 Ahora ejecutamos `$ ls` y veremos el archivo `wordpress.backup` :)
 
-
 ## Compartir información entre el Docker Host y los contenedores
 
 **Problema:**
 
-Tenemos información local, que queremos que este disponible en un contenedor.
+- Tenemos información local, que queremos que este disponible en un contenedor (por ejemplo, en desarrollo, el codigo de tu aplicación).
+- Tenemos informacion del contenedor que necesitamos guardar en el host (por ejemplo una base de datos)
 
 **Solución:**
 
@@ -455,7 +468,9 @@ Usando volúmenes (opción `-v` antes vista) para montar uno entre el host y el 
 
 Por ejemplo, si queremos compartir nuestro directorio de trabajo, con un directorio particular del contenedor podríamos hacer:
 
-`docker run -ti -v "$PWD":/pepe ubuntu:14.04 /bin/bash`
+```
+  docker run -ti -v "$PWD":/pepe ubuntu:14.04 /bin/bash
+```
 
 Lo que hicimos con ese comando, fue montar como volumen nuestro directorio actual con el directorio `/pepe` en el contenedor (OJO, `/` referencia al root del filesystem). Además, como vimos antes con las opciones `-ti` levantamos un tty y de modo interativo ejecutamos una instancia de bash.
 
@@ -467,7 +482,15 @@ Docker provee de un comando `docker inspect` que sirve para observar la informac
 
 Con el comando anterior, filtramos de toda la información, solo los puntos de montaje. Como salida obtendremos algo como:
 
-`[{ /path/to/pwd /pepe  true}]`
+`[{ /path/to/pwd /pepe true}]`
+
+**Disclaimer**
+
+Docker tiene un [apartado sobre volúmenes](https://docs.docker.com/storage/) que es muy importante conocer.
+
+Cada tipo de volumen (bind, tmpfs, named) tienen usos distintos, y hacer uso del equivocado podria traernos problemas de performance o aun peor, perdida de datos si no usamos los comandos adecuadamente.
+
+Si te encontras con problemas de performance en OSX, probablemente esto te sea util [docker sync](http://docker-sync.io/)
 
 ## Compartir información entre contenedores
 
@@ -477,7 +500,7 @@ Ya sabemos cómo montar un volumen de nuestro Host en un contenedor. Pero ahora 
 
 **Solución:**
 
-Usando *data containers*. Cuando queremos montar un volúmen en un contenedor lo que hacemos es con el argumento `-v` decirle el directorio *X* del host que debe montarse en el el path *Y* del contenedor.
+Usando _data containers_. Cuando queremos montar un volúmen en un contenedor lo que hacemos es con el argumento `-v` decirle el directorio _X_ del host que debe montarse en el el path _Y_ del contenedor.
 El volúmen especificado se crea como de lectura-escritura dentro del contenedor y no como las capas de sólo lectura usadas para crear el contenedor, pudiéndose modificar también desde la máquina host.
 
 ```
@@ -535,9 +558,9 @@ pepe.txt
 
 Después de crear varios contenedores, tal vez quisiéramos crear nuestras propias imágenes también. Cuando iniciamos un contenedor, al mismo lo iniciamos desde una imagen base. Una vez con el contenedor en ejecución nosotros podríamos hacer cambios, por ejemplo, instalarle ciertas librerías o dependencias (ejemplo, correr `apt install htop vim git` dentro de un contenedor que tiene de imagen base, `ubuntu`).
 Luego de haber ejecutado este comando, el contenedor ha modificado su filesystem. Nosotros a futuro tal vez quisiéramos ejecutar contenedores iguales al anterior, por lo que Docker nos provee del comando `commit` para, a partir de un contenedor, crear una imagen.
-Docker mantiene las diferencias entre la imagen base y la que se quiere crear, creando una nueva *layer* usando [UnionFS](https://es.wikipedia.org/wiki/UnionFS). Similar a *git*.
+Docker mantiene las diferencias entre la imagen base y la que se quiere crear, creando una nueva _layer_ usando [UnionFS](https://es.wikipedia.org/wiki/UnionFS). Similar a _git_.
 
-Crearemos un contenedor de *ubuntu*, y al mismo le actualizaremos la lista de repositorios. Luego de ello, haremos un `docker commit`, para definir la nueva imagen para mantener una imagen mas actualizada.
+Crearemos un contenedor de _ubuntu_, y al mismo le actualizaremos la lista de repositorios. Luego de ello, haremos un `docker commit`, para definir la nueva imagen para mantener una imagen mas actualizada.
 
 ```
 $ docker run -t -i --name=contenedorPrueba ubuntu:14.04 /bin/bash
@@ -584,8 +607,8 @@ C /var/lib/apt/lists
 
 **Solución:**
 
-  * Para las `images`: Usar los comandos `save` y `load` para crear el archivo comprimido de la imagen anteriormente creada.
-  * Para los `containers`: Usar los comandos `import` y `export`.
+- Para las `images`: Usar los comandos `save` y `load` para crear el archivo comprimido de la imagen anteriormente creada.
+- Para los `containers`: Usar los comandos `import` y `export`.
 
 Comencemos con un `container` creado y exportándolo en un archivo `.tar` (tarball).
 
@@ -599,7 +622,6 @@ Comencemos con un `container` creado y exportándolo en un archivo `.tar` (tarba
 ```
 
 Se puede hacer `commit` de este contenedor como una nueva imagen local, pero tambien se podría usar el comando `import`:
-
 
 ```
   $ docker import - update < update.tar
@@ -616,7 +638,7 @@ Entonces, **¿Cuál es la diferencia?**
 
 Los 2 métodos son similares; La diferencia está en que guardando una imagen mantenemos el historial de cambios, y exportándola como contenedor NO.
 
-*A mi punto de vista, tal vez lo mejor sería sólo mantener los cambios cuando ya es algo en producción y deseamos hacer actualización de software. Por ejemplo del SO o de APACHE/NGINX, donde si ocurre una falla o incompatibilidad, podría volverse atrás. En cambio mientras estamos haciendo el desarrollo, mantener los cambios tal vez no sea tan importante.*
+_A mi punto de vista, tal vez lo mejor sería sólo mantener los cambios cuando ya es algo en producción y deseamos hacer actualización de software. Por ejemplo del SO o de APACHE/NGINX, donde si ocurre una falla o incompatibilidad, podría volverse atrás. En cambio mientras estamos haciendo el desarrollo, mantener los cambios tal vez no sea tan importante._
 
 ## Escribiendo nuestro primer DockerFile
 
@@ -627,7 +649,7 @@ Ejecutar contenedores en modo interactivo, hacer algunos cambios y para luego co
 **Solución:**
 
 Para automatizar el proceso de creación de imágenes Docker, prepararemos tales paso en un archivo de manifiesto, llamado **Dockerfile**.
-Este archivo de texto está compuesto por una serie de instrucciones que describe cuál es la *imagen base* de la que el nuevo contenedor se basará, cuáles pasos necesitan llevarse a cabo para instalar las *dependencias* de la aplicación, cuáles *archivos* necesitan estar presentes en la imagen, cuáles puertos serán *expuestos* por el contenedor y cuáles *comando* ejecutar cuando se ejecuta el contenedor, entre otras cosas.
+Este archivo de texto está compuesto por una serie de instrucciones que describe cuál es la _imagen base_ de la que el nuevo contenedor se basará, cuáles pasos necesitan llevarse a cabo para instalar las _dependencias_ de la aplicación, cuáles _archivos_ necesitan estar presentes en la imagen, cuáles puertos serán _expuestos_ por el contenedor y cuáles _comando_ ejecutar cuando se ejecuta el contenedor, entre otras cosas.
 
 Para ilustrar esto, crearemos un simple Dockerfile. La **imagen** resultante nos permitirá crear un contenedor que ejecuta el comando `/bin/echo`.
 
@@ -637,7 +659,7 @@ FROM ubuntu:14.04
 ENTRYPOINT ["/bin/echo"]
 ```
 
-La instrucción `FROM` dice de cuál **imagen base** partimos para crear la nuestra. En este caso `ubuntu:14.04`, que la primera vez será descargada del repositorio del *Docker Hub*.
+La instrucción `FROM` dice de cuál **imagen base** partimos para crear la nuestra. En este caso `ubuntu:14.04`, que la primera vez será descargada del repositorio del _Docker Hub_.
 
 La instrucción `ENTRYPOINT` dice cuál es el comando a ejecutar cuando el contenedor basado en esta imagen, sea ejecutado.
 
@@ -750,7 +772,6 @@ Para instalar el modulo Flask simplemente corremos este comando
 
 `$ pip install Flask`
 
-
 ```
 #!/usr/bin/env python
 
@@ -791,16 +812,16 @@ El Dockerfile quedaría de la siguiente forma:
 
 **Nota**: Este Dockerfile no está optimizado, intencionalmente. Para optimizarlo lo veremos más adelante, pero esto sólo es para entender lo básico.
 
-El comando `RUN` permite ejecutar comandos específicos durante el *build* de la imagen del contenedor.
+El comando `RUN` permite ejecutar comandos específicos durante el _build_ de la imagen del contenedor.
 Para copiar nuestra aplicación dentro de la imagen del contenedor, usamos el comando `ADD`. En nuestro caso, copia el archivo `hello.py` al directorio `/tmp` de la imagen del contenedor.
-La aplicación usa el puerto `5000`, y tenemos que *exponer* este puerto al Docker Host.
+La aplicación usa el puerto `5000`, y tenemos que _exponer_ este puerto al Docker Host.
 Finalmente, el comando `CMD` especifica que el contenedor debe ejecutar `python /tmp/hello.py` cuando se ejecute.
 
-Procedemos a hacer *build* de la imagen.
+Procedemos a hacer _build_ de la imagen.
 
 `$ docker build -t flask .`
 
-Esto creó una imagen Docker *flask*:
+Esto creó una imagen Docker _flask_:
 
 ```
 $ docker images
@@ -809,7 +830,7 @@ flask         latest    d381310506ed    3 seconds ago   354.6 MB
 ...
 ```
 
-Para correr esta aplicación usaremos la opción `-d`, la cual *daemonizará* el contenedor. Tambien pasaremos el argumento `-P` para decirle a Docker que elija un puerto en el *Docker Host* para *forwardear* al puerto expuesto por el contenedor.
+Para correr esta aplicación usaremos la opción `-d`, la cual _daemonizará_ el contenedor. Tambien pasaremos el argumento `-P` para decirle a Docker que elija un puerto en el _Docker Host_ para _forwardear_ al puerto expuesto por el contenedor.
 
 ```
 $ docker run -d -P flask
@@ -822,9 +843,9 @@ $ docker run -d -P flask
   5ac72ed12a72    flask:latest    "python /tmp/hello.py    ...   0.0.0.0:49153->5000/tcp
 ```
 
-El contenedor retornado, está *daemonizado* y no con nosotros logueados en una shell interativa dentro. La sección PORTS nos muestra el mapeo de puertos del contenedor en cuestión. En este caso mapea el puerto 49153 del **Docker Host** al puerto 5000 del **contenedor**. Si ahora ingresamos en [http://localhost:49153](http://localhost:49153), deberíamos ver el mensaje `hello world!`.
+El contenedor retornado, está _daemonizado_ y no con nosotros logueados en una shell interativa dentro. La sección PORTS nos muestra el mapeo de puertos del contenedor en cuestión. En este caso mapea el puerto 49153 del **Docker Host** al puerto 5000 del **contenedor**. Si ahora ingresamos en [http://localhost:49153](http://localhost:49153), deberíamos ver el mensaje `hello world!`.
 
-**Nota:** Notar que no se le pasó un comando a ejecutar en el comando `run`, esto se debe a que ejecutará el `CMD` definido  en el Dockerfile. También podriamos sobreescribir el comando, por ejemplo:
+**Nota:** Notar que no se le pasó un comando a ejecutar en el comando `run`, esto se debe a que ejecutará el `CMD` definido en el Dockerfile. También podriamos sobreescribir el comando, por ejemplo:
 
 ```
 $ docker run -t -i -P flask /bin/bash
@@ -846,18 +867,18 @@ Docker expone en su documentación [una sección de buenas prácticas](https://d
 
 Estas son algunas instrucciones para crear buenas `Docker Images`.
 
-1. Ejecutar un único proceso por contenedor. De todas formas podríamos correr multiples procesos por contenedor, como se vió cuando usamos `supervisor`. En este caso, `supervisor` es el único proceso de cara al contenedor, pero éste levanta internamente otros procesos. Seguir la práctica de un único proceso por contenedor, nos permite hacer aplicaciones desacopladas que podrían escalar. Esto nos permite además usar *container links* u otras técnicas de *container networking* que veremos más adelante.
+1. Ejecutar un único proceso por contenedor. De todas formas podríamos correr multiples procesos por contenedor, como se vió cuando usamos `supervisor`. En este caso, `supervisor` es el único proceso de cara al contenedor, pero éste levanta internamente otros procesos. Seguir la práctica de un único proceso por contenedor, nos permite hacer aplicaciones desacopladas que podrían escalar. Esto nos permite además usar _container links_ u otras técnicas de _container networking_ que veremos más adelante.
 
 2. No asumir que nuestros contenedores estarán siempre corriendo; Estos son efímeros y serán parados y reiniciados. Se debería tratarlos como entidades inmutables, lo que significa que no deberíamos modificarlos mientras están en ejecución, sino modificar el Dockerfile reconstruir la imagen y levantar un contenedor con esa imagen actualizada.
-Por lo tanto, se recomienda manejar datos y configuraciones de ejecución fuera del contenedor y por lo tanto de su imagen.
-Para esto, usamos `Docker Volumes`.
+   Por lo tanto, se recomienda manejar datos y configuraciones de ejecución fuera del contenedor y por lo tanto de su imagen.
+   Para esto, usamos `Docker Volumes`.
 
-3. Usar un archivo `.dockerignore`. Cuando creamos imágenes, Docker copiará el contenido del *working directory* donde se encuentra el Dockerfile, dentro de la imagen. Con los archivos `.dockerignore` obtenemos un funcionamiento como el `.gitignore` y básicamente lo que logramos es excluir archivos (basura o sensibles) que no queremos que estén dentro de la imagen. El uso del `.dockerignore` es opcional, pero si no lo usamos, aseguremonos de copiar lo mínimo y necesario. Podemos chequear la sintaxis del mismo en este [link](https://docs.docker.com/engine/reference/builder/#dockerignore-file).
+3. Usar un archivo `.dockerignore`. Cuando creamos imágenes, Docker copiará el contenido del _working directory_ donde se encuentra el Dockerfile, dentro de la imagen. Con los archivos `.dockerignore` obtenemos un funcionamiento como el `.gitignore` y básicamente lo que logramos es excluir archivos (basura o sensibles) que no queremos que estén dentro de la imagen. El uso del `.dockerignore` es opcional, pero si no lo usamos, aseguremonos de copiar lo mínimo y necesario. Podemos chequear la sintaxis del mismo en este [link](https://docs.docker.com/engine/reference/builder/#dockerignore-file).
 
 4. Usar imágenes oficiales del Docker Hub, en lugar de escribir las nuestras desde cero. Estas imágenes están mantenidas por quienes son las empresas autoras de ese software. También podemos usar `ONBUILD images`, para simplicar el proceso de creación de nuestras imágenes.
 
-5. Finalmente, y de los más importantes, minimizar el número de capas de nuestras imágenes usando la caché de imagen. Docker usa [union filesystems](https://es.wikipedia.org/wiki/UnionFS) para almacenar las imágenes. Esto quiere decir que cada imagen se hace a partir de una imagen base más una colección de *diffs* que agregan los cambios requeridos. Cada *diff* representa una capa adicional en una imagen. Esto tiene un impacto directo en como nosotros escribimos nuestro Dockerfile y las directivas que usamos.
-En la sección siguiente veremos este punto.
+5. Finalmente, y de los más importantes, minimizar el número de capas de nuestras imágenes usando la caché de imagen. Docker usa [union filesystems](https://es.wikipedia.org/wiki/UnionFS) para almacenar las imágenes. Esto quiere decir que cada imagen se hace a partir de una imagen base más una colección de _diffs_ que agregan los cambios requeridos. Cada _diff_ representa una capa adicional en una imagen. Esto tiene un impacto directo en como nosotros escribimos nuestro Dockerfile y las directivas que usamos.
+   En la sección siguiente veremos este punto.
 
 Con estos puntos, haremos unos pequeños cambios en la imagen creada en la sección anterior:
 
@@ -916,7 +937,7 @@ Aun así podríamos aplicar más optimizaciones como la siguiente:
   CMD ["python","/tmp/hello.py"]
 ```
 
-Entre los cambios, se puede ver que cambiamos a `ubuntu` por `python` como *imagen base* (aplicando el punto `2.` de optimizaciones). Eliminando toda la instalación de dependencias para python.
+Entre los cambios, se puede ver que cambiamos a `ubuntu` por `python` como _imagen base_ (aplicando el punto `2.` de optimizaciones). Eliminando toda la instalación de dependencias para python.
 Estas optimizaciones aún podrían ser más optimizables como, por ejemplo, usar la imagen base de `Flask`, pero la idea es que se note la diferencia entre un `Dockerfile` y otro optimizado.
 
 ## Configuración avanzada de red
@@ -929,30 +950,35 @@ Configuración de bridges:
 --bridge=BRIDGE
 
 ```
+
 Activar la comunicación entre contenedores:
 
 ```
 --icc=true|false
 
 ```
+
 Especificar la IP a la que responderá el contenedor:
 
 ```
 --ip=IP_ADDRESS
 
 ```
+
 Habilitar IP Forwarding:
 
 ```
 --ip-forward=true|false
 
 ```
+
 Habilitar iptables:
 
 ```
 --iptables=true|false
 
 ```
+
 Especificar DNS y dominio de búsqueda DNS:
 
 ```
